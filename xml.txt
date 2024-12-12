@@ -1,0 +1,45 @@
+Sub Macro1()
+'
+' Macro1 Macro
+'
+
+'
+    Application.CutCopyMode = False
+    ActiveWorkbook.Queries.Add Name:="Query1", Formula:= _
+        "let" & Chr(13) & "" & Chr(10) & "    Source = Sql.Database(""202.5.62.170"", ""ORANGE_ERP"", [Query=""SELECT COMM_RCPT_VCH.PROD_ID, COMM_PARTY_INFO.PARTY_NAME, COMM_PARTY_INFO.SMS_MOB_NO, COMM_RCPT_VCH.MR_DATE, COMM_RCPT_VCH.MR_TYPE, COMM_RCPT_VCH.LEDG_NAME, COMM_RCPT_VCH.AMNT FROM COMM_RCPT_VCH INNER JOIN COMM_PARTY_INFO ON COMM_RCPT_VCH.PARTY_ID = COMM_PARTY_INFO.PARTY_ID#(lf)WHERE COMM_RCPT" & _
+        "_VCH.COMP_ID = 'C0001' AND #(lf)COMM_RCPT_VCH.MR_DATE >= '12/01/2024' AND COMM_RCPT_VCH.MR_DATE <= '12/02/2024'#(lf)ORDER BY COMM_RCPT_VCH.MR_DATE ASC""])" & Chr(13) & "" & Chr(10) & "in" & Chr(13) & "" & Chr(10) & "    Source" & _
+        ""
+    With ActiveSheet.ListObjects.Add(SourceType:=0, Source:= _
+        "OLEDB;Provider=Microsoft.Mashup.OleDb.1;Data Source=$Workbook$;Location=Query1;Extended Properties=""""" _
+        , Destination:=Range("$E$8")).QueryTable
+        .CommandType = xlCmdSql
+        .CommandText = Array("SELECT * FROM [Query1]")
+        .RowNumbers = False
+        .FillAdjacentFormulas = False
+        .PreserveFormatting = True
+        .RefreshOnFileOpen = False
+        .BackgroundQuery = True
+        .RefreshStyle = xlInsertDeleteCells
+        .SavePassword = False
+        .SaveData = True
+        .AdjustColumnWidth = True
+        .RefreshPeriod = 0
+        .PreserveColumnInfo = True
+        .ListObject.DisplayName = "Query1"
+        .Refresh BackgroundQuery:=False
+    End With
+    ActiveSheet.ListObjects("Query1").Name = "CollRpt"
+End Sub
+
+
+Sub SubTest()
+Dim StartDate As Date
+Dim EndDate As Date
+
+StartDate = Sheets("Sheet1").Range("D3").Value
+EndDate = Sheets("Sheet1").Range("D4").Value
+ActiveWorkbook.Queries("CollRpt").Formula = "let Source = Sql.Database(""202.5.62.170"", ""ORANGE_ERP"", [Query=""SELECT COMM_RCPT_VCH.PROD_ID, COMM_PARTY_INFO.PARTY_NAME, COMM_PARTY_INFO.SMS_MOB_NO, COMM_RCPT_VCH.MR_DATE, COMM_RCPT_VCH.MR_TYPE, COMM_RCPT_VCH.LEDG_NAME, COMM_RCPT_VCH.AMNT FROM COMM_RCPT_VCH INNER JOIN COMM_PARTY_INFO ON COMM_RCPT_VCH.PARTY_ID = COMM_PARTY_INFO.PARTY_ID#(lf)WHERE COMM_RCPT" & _
+        "_VCH.COMP_ID = 'C0001' AND #(lf)COMM_RCPT_VCH.MR_DATE >= '" & StartDate & "' AND COMM_RCPT_VCH.MR_DATE <= '" & EndDate & "'#(lf)ORDER BY COMM_RCPT_VCH.MR_DATE ASC""])" & Chr(13) & "" & Chr(10) & "in" & Chr(13) & "" & Chr(10) & "    Source" & _
+        ""
+ActiveWorkbook.Queries("CollRpt").Refresh
+End Sub
